@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ "x$1" = "x" ]; then
+	echo "please run configure with toolchain prefix parameter, e.g. m68k-unknown-linux-gnu-"
+	exit 1
+fi
+PREFIX=$1
+
+rm -rf build
+mkdir build
+pushd build
+cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_C_COMPILER=${PREFIX}gcc -DCMAKE_CXX_COMPILER=${PREFIX}g++ \
+	-DCMAKE_CXX_COMPILER_ARG1=-nostdlib \
+	-DCMAKE_C_COMPILER_ARG1=-nostdlib
+
+popd
+
+echo
+echo
+echo "*** Run ninja -C build to continue"
