@@ -37,6 +37,7 @@ int main(int argc, char **argv)
 			ss << ip;
 		}
 		ss << "], ";
+		ss << "\"thread\": " << rec.Thread << ", ";
 		ss << "\"ptr\": " << rec.Ptr;
 		std::string common = ss.str();
 
