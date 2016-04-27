@@ -36,16 +36,17 @@ int main(int argc, char **argv)
 				ss << ", ";
 			ss << ip;
 		}
-		ss << "]";
-		std::string backtrace = ss.str();
+		ss << "], ";
+		ss << "\"ptr\": " << rec.Ptr;
+		std::string common = ss.str();
 
 		switch(rec.Type)
 		{
 		case RecordType::Alloc:
-			printf("{\"action\": \"alloc\", \"ptr\": \"%llu\", \"size\": %lu, %s }", static_cast<unsigned long long>(rec.Ptr), (unsigned long)rec.Size, backtrace.c_str());
+			printf("{\"action\": \"alloc\", \"size\": %lu, %s }", (unsigned long)rec.Size, common.c_str());
 			break;
 		case RecordType::Free:
-			printf("{\"action\": \"free\", \"ptr\": \"%llu\", %s }", static_cast<unsigned long long>(rec.Ptr), backtrace.c_str());
+			printf("{\"action\": \"free\", %s }", common.c_str());
 			break;
 		default:
 			printf("{\"action\": \"invalid\" }");
