@@ -8,5 +8,3 @@ add_library(post-mortem SHARED src/main.cpp)
 target_link_libraries(post-mortem ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(post-mortem-log src/reader.cpp)
-add_definitions(-ggdb)
-add_executable(test-cpp tests/delete.cpp)
