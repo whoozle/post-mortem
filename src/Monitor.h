@@ -29,17 +29,17 @@ public:
 		return _fd;
 	}
 
-	static void Alloc(void *p)
+	static void Alloc(void *p, size_t size)
 	{
 		int fd = GetFD();
-		Record record(RecordType::Alloc);
+		Record record(RecordType::Alloc, p, size);
 		write(fd, static_cast<void *>(&record), sizeof(record));
 	}
 
 	static void Free(void *p)
 	{
 		int fd = GetFD();
-		Record record(RecordType::Free);
+		Record record(RecordType::Free, p);
 		write(fd, static_cast<void *>(&record), sizeof(record));
 	}
 };

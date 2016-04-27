@@ -7,7 +7,7 @@ void *malloc(size_t size)
 {
 	void *p = __libc_malloc(size);
 	if (p)
-		Monitor::Alloc(p);
+		Monitor::Alloc(p, size);
 	return p;
 }
 
@@ -24,7 +24,7 @@ void *calloc(size_t nmemb, size_t size)
 {
 	void *p = __libc_calloc(nmemb, size);
 	if (p)
-		Monitor::Alloc(p);
+		Monitor::Alloc(p, size);
 	return p;
 }
 
@@ -34,7 +34,7 @@ void *realloc(void *ptr, size_t size)
 	void *p = __libc_realloc(ptr, size);
 	if (p) {
 		Monitor::Free(ptr);
-		Monitor::Alloc(p);
+		Monitor::Alloc(p, size);
 	}
 	return p;
 }
