@@ -15,7 +15,7 @@ struct Record
 	RecordType		Type;
 	_Unwind_Ptr		BacktraceData[MaxDepth];
 
-	Record(RecordType type): Type(type)
+	Record(RecordType type): Type(type), BacktraceData()
 	{ Backtrace::Get(BacktraceData, MaxDepth); }
 };
 
