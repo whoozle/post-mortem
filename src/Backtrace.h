@@ -2,6 +2,7 @@
 #define BACKTRACE_H
 
 #include <unwind.h>
+#include <stddef.h>
 
 class Backtrace
 {

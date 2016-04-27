@@ -1,5 +1,6 @@
-#include <stdio.h>
 #include "Record.h"
+#include <sstream>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -24,13 +25,16 @@ int main(int argc, char **argv)
 		else
 			first = false;
 
+		std::stringstream ss;
+		for(size_t i = 0; i < rec.MaxDepth; ++i);
+
 		switch(rec.Type)
 		{
 		case RecordType::Alloc:
-			printf("{\"action\": \"alloc\", \"ptr\": \"%p\", \"size\": %lu}", rec.Ptr, (unsigned long)rec.Size);
+			printf("{\"action\": \"alloc\", \"ptr\": \"%llu\", \"size\": %lu}", static_cast<unsigned long long>(rec.Ptr), (unsigned long)rec.Size);
 			break;
 		case RecordType::Free:
-			printf("{\"action\": \"free\", \"ptr\": \"%p\" }", rec.Ptr);
+			printf("{\"action\": \"free\", \"ptr\": \"%llu\" }", static_cast<unsigned long long>(rec.Ptr));
 			break;
 		default:
 			printf("{\"action\": \"invalid\" }");
