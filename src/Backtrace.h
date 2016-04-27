@@ -29,9 +29,10 @@ private:
 	static _Unwind_Reason_Code DoUnwind(struct _Unwind_Context *ctx, void *state_)
 	{
 		State *state = static_cast<State *>(state_);
-		*state->Data++ = _Unwind_GetIP(ctx);
+		_Unwind_Ptr ip = _Unwind_GetIP(ctx);
+		*state->Data++ = ip;
 		--state->Size;
-		return state->Size? _URC_NO_REASON: _URC_NORMAL_STOP;
+		return ip && state->Size? _URC_NO_REASON: _URC_NORMAL_STOP;
 	}
 };
 
