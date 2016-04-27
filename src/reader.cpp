@@ -29,9 +29,12 @@ int main(int argc, char **argv)
 		ss << "\"backtrace\": [";
 		for(size_t i = 0; i < rec.MaxDepth; ++i)
 		{
+			_Unwind_Ptr ip = rec.BacktraceData[i];
+			if (!ip)
+				break;
 			if (i)
 				ss << ", ";
-			ss << rec.BacktraceData[i];
+			ss << ip;
 		}
 		ss << "]";
 		std::string backtrace = ss.str();
