@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include "Monitor.h"
 #include "Malloc.h"
+#include <new>
 
 __attribute__ ((visibility ("default")))
 void *malloc(size_t size)
@@ -44,7 +45,19 @@ void* operator new(size_t size)
 }
 
 __attribute__ ((visibility ("default")))
+void* operator new( size_t size, const std::nothrow_t& ) throw()
+{
+	return malloc(size);
+}
+
+__attribute__ ((visibility ("default")))
 void* operator new[](size_t size)
+{
+	return malloc(size);
+}
+
+__attribute__ ((visibility ("default")))
+void* operator new[](size_t size, const std::nothrow_t& ) throw()
 {
 	return malloc(size);
 }
@@ -56,7 +69,19 @@ void operator delete (void *p)
 }
 
 __attribute__ ((visibility ("default")))
+void operator delete (void *p, const std::nothrow_t& ) throw()
+{
+	return free(p);
+}
+
+__attribute__ ((visibility ("default")))
 void operator delete[] (void *p)
+{
+	return free(p);
+}
+
+__attribute__ ((visibility ("default")))
+void operator delete[] (void *p, const std::nothrow_t& ) throw()
 {
 	return free(p);
 }
