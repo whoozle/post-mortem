@@ -17,23 +17,30 @@ with open(args.log) as f:
 
 symbols = []
 address = []
+loaded = False
 
 sym_re = re.compile(r'^([0-f]+).*\.text\s+([0-f]+)\s+(.+)$', re.IGNORECASE | re.MULTILINE)
 
-if args.exe:
-	p = Popen(['objdump', '-t', '-g', '-C', args.exe], bufsize=1024*1024, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
-	print "reading symbols..."
-	stdout, stderr = p.communicate()
-	print "sorting..."
-	for sym in sym_re.finditer(stdout):
-		addr = int(sym.group(1), 16)
-		address.append(addr)
-		symbols.append((addr, int(sym.group(2), 16), sym.group(3)))
-	symbols.sort(key = lambda s: s[0])
-	address.sort()
-	print "loaded %d symbols" %len(symbols)
+def load_symbols():
+	if loaded:
+		return
+
+	loaded = True
+	if args.exe:
+		p = Popen(['objdump', '-t', '-g', '-C', args.exe], bufsize=1024*1024, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+		print "reading symbols..."
+		stdout, stderr = p.communicate()
+		print "sorting..."
+		for sym in sym_re.finditer(stdout):
+			addr = int(sym.group(1), 16)
+			address.append(addr)
+			symbols.append((addr, int(sym.group(2), 16), sym.group(3)))
+		symbols.sort(key = lambda s: s[0])
+		address.sort()
+		print "loaded %d symbols" %len(symbols)
 
 def get_location(ip):
+	load_symbols()
 	idx = bisect.bisect(address, ip)
 	idx -= 1
 
