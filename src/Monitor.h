@@ -25,6 +25,8 @@ public:
 				write(STDOUT_FILENO, error, strlen(error));
 				abort();
 			}
+			unsigned version = 0;
+			write(_fd, &version, sizeof(version));
 		}
 		return _fd;
 	}

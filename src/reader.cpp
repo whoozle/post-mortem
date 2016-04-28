@@ -11,6 +11,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	printf("{ \"log\": [\n");
+	unsigned version;
+	if (fread(&version, sizeof(version), 1, log) != 1)
+		perror("fread");
+
 	bool first = true;
 	while(true)
 	{
