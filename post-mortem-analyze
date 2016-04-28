@@ -2,6 +2,9 @@
 
 import argparse
 import json
+import re
+import bisect
+from subprocess import Popen, PIPE, STDOUT
 
 parser = argparse.ArgumentParser(description='Post-mortem log analyzer')
 parser.add_argument('log', help='log file')
@@ -12,8 +15,33 @@ args = parser.parse_args()
 with open(args.log) as f:
 	data = json.load(f)
 
+symbols = []
+address = []
+
+sym_re = re.compile(r'^([0-f]+).*\.text\s+([0-f]+)\s+(.+)$', re.IGNORECASE | re.MULTILINE)
+
+if args.exe:
+	p = Popen(['objdump', '-t', '-g', '-C', args.exe], bufsize=1024*1024, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+	print "reading symbols..."
+	stdout, stderr = p.communicate()
+	print "sorting..."
+	for sym in sym_re.finditer(stdout):
+		addr = int(sym.group(1), 16)
+		address.append(addr)
+		symbols.append((addr, int(sym.group(2), 16), sym.group(3)))
+	symbols.sort(cmp = lambda s1, s2: cmp(s1, s2))
+	print "loaded %d symbols" %len(symbols)
+
 def get_location(ip):
-	location = "?"
+	idx = bisect.bisect(address, ip)
+	if idx > 0:
+		idx -= 1
+
+	addr, size, name = symbols[idx]
+	if ip >= addr and ip <= addr + size:
+		location = name + " (+%d)" %(ip - addr)
+	else:
+		location = "?"
 	return "\t0x%08x\t%s" %(ip, location)
 
 class State(object):
@@ -37,7 +65,6 @@ class Chunk(object):
 		print "%s on pointer with address 0x%08x" %(message, old.ptr)
 		self.show_state(old)
 		self.show_state(new)
-
 
 	def event(self, state):
 		old = self.state
