@@ -19,8 +19,16 @@ public:
 	{
 		if (_fd < 0)
 		{
+			char exenamebuf[BUFSIZ];
+			readlink("/proc/self/exe", exenamebuf, BUFSIZ);
+			char *exename = strrchr(exenamebuf, '/');
+			if (exename == NULL)
+				exename = exenamebuf;
+			else
+				++exename;
+			write(STDOUT_FILENO, exename, strlen(exename));
 			char filename[64];
-			snprintf(filename, sizeof(filename), "post-mortem.%d.log", getpid());
+			snprintf(filename, sizeof(filename), "post-mortem.%s.%d.log", exename, getpid());
 			_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
 			if (_fd == -1)
 			{
