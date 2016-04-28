@@ -1,0 +1,76 @@
+#!/usr/bin/env python
+
+import argparse
+import json
+
+parser = argparse.ArgumentParser(description='Post-mortem log analyzer')
+parser.add_argument('log', help='log file')
+parser.add_argument('--exe', help='executable')
+parser.add_argument('-s', help='show reachable')
+args = parser.parse_args()
+
+with open(args.log) as f:
+	data = json.load(f)
+
+def get_location(ip):
+	location = "?"
+	return "\t0x%08x\t%s" %(ip, location)
+
+class State(object):
+	def __init__(self, ev):
+		self.__dict__  = ev
+	def __repr__(self):
+		return str(self.__dict__)
+
+class Chunk(object):
+	def __init__(self, state):
+		if state.action == 'free':
+			print "FREE WITHOUT ALLOC"
+		self.state = state
+
+	def show_state(self, state):
+		print "thread id: 0x%08x" %state.thread
+		for ip in state.backtrace:
+			print get_location(ip)
+
+	def failure(self, message, old, new):
+		print "%s on pointer with address 0x%08x" %(message, old.ptr)
+		self.show_state(old)
+		self.show_state(new)
+
+
+	def event(self, state):
+		old = self.state
+		if old.action == 'free' and state.action == 'free':
+			self.failure('double free', old, state)
+
+		if old.action == 'alloc' and state.action == 'alloc':
+			self.failure('double alloc', old, state)
+		self.state = state
+
+class Heap(object):
+	def __init__(self):
+		self.__chunks = {}
+
+	def dispatch(self, ev):
+		ptr = ev['ptr']
+		if ptr == 0:
+			return
+		if ptr in self.__chunks:
+			self.__chunks[ptr].event(State(ev))
+		else:
+			self.__chunks[ptr] = Chunk(State(ev))
+
+	def dump_alloc(self):
+		return filter(lambda x: x.state.action == 'alloc', self.__chunks.itervalues())
+
+heap = Heap()
+log = data['log']
+for event in log:
+	heap.dispatch(event)
+
+if args.s:
+	reachable = heap.dump_alloc()
+	for chunk in reachable:
+		state = chunk.state
+		print "memory block of %d bytes is still reachable" %state.size
