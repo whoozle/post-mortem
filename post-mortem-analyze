@@ -60,6 +60,7 @@ class Chunk(object):
 		print "thread id: 0x%08x" %state.thread
 		for ip in state.backtrace:
 			print get_location(ip)
+		print
 
 	def failure(self, message, old, new):
 		print "%s on pointer with address 0x%08x" %(message, old.ptr)
