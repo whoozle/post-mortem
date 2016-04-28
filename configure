@@ -6,13 +6,13 @@ if [ "x$1" = "x" ]; then
 fi
 PREFIX=$1
 
-rm -rf build
-mkdir build
-pushd build
+rm -rf ${PREFIX}build
+mkdir ${PREFIX}build
+pushd ${PREFIX}build
 cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${PREFIX}gcc -DCMAKE_CXX_COMPILER=${PREFIX}g++
 
 popd
 
 echo
 echo
-echo "*** Run ninja -C build to continue"
+echo "*** Run ninja -C ${PREFIX}build to continue"
