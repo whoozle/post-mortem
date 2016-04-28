@@ -24,7 +24,7 @@ void *calloc(size_t nmemb, size_t size)
 {
 	void *p = __libc_calloc(nmemb, size);
 	if (p)
-		Monitor::Alloc(p, size);
+		Monitor::Alloc(p, nmemb * size);
 	return p;
 }
 
