@@ -44,6 +44,8 @@ public:
 
 	static void Alloc(void *p, size_t size)
 	{
+		if (!p)
+			return;
 		int fd = GetFD();
 		Record record(RecordType::Alloc, p, size);
 		write(fd, static_cast<void *>(&record), sizeof(record));
@@ -51,6 +53,8 @@ public:
 
 	static void Free(void *p)
 	{
+		if (!p)
+			return
 		int fd = GetFD();
 		Record record(RecordType::Free, p);
 		write(fd, static_cast<void *>(&record), sizeof(record));

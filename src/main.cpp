@@ -6,16 +6,14 @@ __attribute__ ((visibility ("default")))
 void *malloc(size_t size)
 {
 	void *p = __libc_malloc(size);
-	if (p)
-		Monitor::Alloc(p, size);
+	Monitor::Alloc(p, size);
 	return p;
 }
 
 __attribute__ ((visibility ("default")))
 void free(void *ptr)
 {
-	if (ptr)
-		Monitor::Free(ptr);
+	Monitor::Free(ptr);
 	__libc_free(ptr);
 }
 
@@ -23,8 +21,7 @@ __attribute__ ((visibility ("default")))
 void *calloc(size_t nmemb, size_t size)
 {
 	void *p = __libc_calloc(nmemb, size);
-	if (p)
-		Monitor::Alloc(p, nmemb * size);
+	Monitor::Alloc(p, nmemb * size);
 	return p;
 }
 
@@ -33,8 +30,7 @@ void *realloc(void *ptr, size_t size)
 {
 	void *p = __libc_realloc(ptr, size);
 	if (p) {
-		if (ptr)
-			Monitor::Free(ptr);
+		Monitor::Free(ptr);
 		Monitor::Alloc(p, size);
 	}
 	return p;
