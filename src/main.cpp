@@ -33,7 +33,8 @@ void *realloc(void *ptr, size_t size)
 {
 	void *p = __libc_realloc(ptr, size);
 	if (p) {
-		Monitor::Free(ptr);
+		if (ptr)
+			Monitor::Free(ptr);
 		Monitor::Alloc(p, size);
 	}
 	return p;
