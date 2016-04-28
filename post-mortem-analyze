@@ -40,7 +40,7 @@ def get_location(ip):
 	location = '?'
 	if idx >= 0 and idx < len(symbols):
 		addr, size, name = symbols[idx]
-		if ip >= addr:
+		if ip >= addr and ip < addr + size:
 			location = name + " (+%d)" %(ip - addr)
 	return "\t0x%08x\t%s" %(ip, location)
 
