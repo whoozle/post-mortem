@@ -54,7 +54,7 @@ public:
 	static void Free(void *p)
 	{
 		if (!p)
-			return
+			return;
 		int fd = GetFD();
 		Record record(RecordType::Free, p);
 		write(fd, static_cast<void *>(&record), sizeof(record));
