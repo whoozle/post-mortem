@@ -29,19 +29,19 @@ if args.exe:
 		addr = int(sym.group(1), 16)
 		address.append(addr)
 		symbols.append((addr, int(sym.group(2), 16), sym.group(3)))
-	symbols.sort(cmp = lambda s1, s2: cmp(s1, s2))
+	symbols.sort(key = lambda s: s[0])
+	address.sort()
 	print "loaded %d symbols" %len(symbols)
 
 def get_location(ip):
 	idx = bisect.bisect(address, ip)
-	if idx > 0:
-		idx -= 1
+	idx -= 1
 
-	addr, size, name = symbols[idx]
-	if ip >= addr and ip <= addr + size:
-		location = name + " (+%d)" %(ip - addr)
-	else:
-		location = "?"
+	location = '?'
+	if idx >= 0 and idx < len(symbols):
+		addr, size, name = symbols[idx]
+		if ip >= addr:
+			location = name + " (+%d)" %(ip - addr)
 	return "\t0x%08x\t%s" %(ip, location)
 
 class State(object):
