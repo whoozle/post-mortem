@@ -6,6 +6,14 @@ if [ "x$1" = "x" ]; then
 fi
 PREFIX=$1
 
+pushd libunwind
+aclocal
+automake
+autoconf
+./configure CC=${PREFIX}gcc CXX=${PREFIX}g++
+make
+popd
+
 rm -rf ${PREFIX}build
 mkdir ${PREFIX}build
 pushd ${PREFIX}build
