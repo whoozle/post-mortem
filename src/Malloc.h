@@ -3,7 +3,6 @@
 
 #include <dlfcn.h>
 #include <malloc.h>
-#include <algorithm>
 
 namespace Malloc
 {

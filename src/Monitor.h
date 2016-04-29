@@ -26,7 +26,6 @@ public:
 				exename = exenamebuf;
 			else
 				++exename;
-			write(STDOUT_FILENO, exename, strlen(exename));
 			char filename[BUFSIZ];
 			snprintf(filename, sizeof(filename), "post-mortem.%s.%d.log", exename, getpid());
 			_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
