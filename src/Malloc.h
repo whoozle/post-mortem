@@ -7,58 +7,10 @@
 
 namespace Malloc
 {
-	char _memory[256 * 1024];
-
-	char *_memory_ptr = _memory;
-	char *_memory_end = _memory + sizeof(_memory);
-
-	bool _is_early(void *ptr_)
-	{
-		char *ptr = static_cast<char *>(ptr_);
-		return ptr >= _memory && ptr < _memory_end;
-	}
-
-	void _early_alloc_error(const char *error)
-	{
-		write(STDOUT_FILENO, error, strlen(error));
-		abort();
-	}
-
-	void * _early_malloc(size_t size)
-	{
-		if (!size)
-			return NULL;
-		char *next = _memory_ptr + size;
-		if (next > _memory_end)
-			_early_alloc_error("early allocator ran out of space\n");
-		char *r = _memory_ptr;
-		_memory_ptr = next;
-		return r;
-	}
-
-	void _early_free(void *ptr)
-	{ }
-
-	void * _early_calloc(size_t nmemb, size_t size)
-	{ void * p = _early_malloc(nmemb * size); memset(p, 0, size); return p; }
-
-	void * _early_realloc(void *ptr, size_t size)
-	{
-		if (!ptr || !size)
-			return _early_malloc(size);
-
-		void *newblock = _early_malloc(size);
-		size_t old_size = malloc_usable_size(ptr);
-		memcpy(newblock, ptr, std::min(old_size, size));
-		free(ptr);
-
-		return NULL;
-	}
-
-	void * (*_malloc)(size_t size) = _early_malloc;
-	void (*_free)(void *ptr) = _early_free;
-	void * (*_calloc)(size_t nmemb, size_t size) = _early_calloc;
-	void * (*_realloc)(void *ptr, size_t size) = _early_realloc;
+	void * (*_malloc)(size_t size) = 0;
+	void (*_free)(void *ptr) = 0;
+	void * (*_calloc)(size_t nmemb, size_t size) = 0;
+	void * (*_realloc)(void *ptr, size_t size) = 0;
 
 	void Init()
 	{
@@ -87,10 +39,7 @@ namespace Malloc
 	static void Free(void *ptr)
 	{
 		Init();
-		if (_is_early(ptr))
-			_early_free(ptr);
-		else
-			_free(ptr);
+		_free(ptr);
 	}
 
 	static void * Calloc(size_t nmemb, size_t size)
@@ -99,7 +48,7 @@ namespace Malloc
 	static void * Realloc(void *ptr, size_t size)
 	{
 		Init();
-		return (_is_early(ptr))? _early_realloc(ptr, size): _realloc(ptr, size);
+		return _realloc(ptr, size);
 	}
 }
 
