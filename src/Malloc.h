@@ -2,10 +2,13 @@
 #define MALLOC_H
 
 #include <dlfcn.h>
+#include <malloc.h>
+#include <algorithm>
 
 namespace Malloc
 {
 	char _memory[256 * 1024];
+
 	char *_memory_ptr = _memory;
 	char *_memory_end = _memory + sizeof(_memory);
 
@@ -23,6 +26,8 @@ namespace Malloc
 
 	void * _early_malloc(size_t size)
 	{
+		if (!size)
+			return NULL;
 		char *next = _memory_ptr + size;
 		if (next > _memory_end)
 			_early_alloc_error("early allocator ran out of space\n");
@@ -39,9 +44,14 @@ namespace Malloc
 
 	void * _early_realloc(void *ptr, size_t size)
 	{
-		if (!ptr)
+		if (!ptr || !size)
 			return _early_malloc(size);
-		_early_alloc_error("realloc\n");
+
+		void *newblock = _early_malloc(size);
+		size_t old_size = malloc_usable_size(ptr);
+		memcpy(newblock, ptr, std::min(old_size, size));
+		free(ptr);
+
 		return NULL;
 	}
 
@@ -59,9 +69,6 @@ namespace Malloc
 		_free	= reinterpret_cast<decltype(_free)>(dlsym(RTLD_NEXT, "free"));
 		_realloc= reinterpret_cast<decltype(_realloc)>(dlsym(RTLD_NEXT, "realloc"));
 		_calloc	= reinterpret_cast<decltype(_calloc)>(dlsym(RTLD_NEXT, "calloc"));
-
-		static const char *error2 = "INIT2\n";
-		write(STDOUT_FILENO, error2, strlen(error2));
 
 		if (!_malloc || !_free || !_calloc || !_realloc)
 		{
