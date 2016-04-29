@@ -38,7 +38,12 @@ namespace Malloc
 	{ void * p = _early_malloc(nmemb * size); memset(p, 0, size); return p; }
 
 	void * _early_realloc(void *ptr, size_t size)
-	{ _early_alloc_error("realloc\n"); return NULL; }
+	{
+		if (!ptr)
+			return _early_malloc(size);
+		_early_alloc_error("realloc\n");
+		return NULL;
+	}
 
 	void * (*_malloc)(size_t size) = _early_malloc;
 	void (*_free)(void *ptr) = _early_free;
