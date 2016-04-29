@@ -4,7 +4,7 @@
 #include <dlfcn.h>
 #include <malloc.h>
 
-#ifdef __GNU_LIBRARY__
+#if defined(__GNU_LIBRARY__) && !defined(__UCLIBC__)
 extern "C"
 {
 	void *__libc_malloc(size_t size);
