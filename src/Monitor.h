@@ -13,6 +13,13 @@
 class Monitor
 {
 	static int _fd;
+	static __thread bool _bypass;
+
+	struct BypassEnable
+	{
+		BypassEnable()  { _bypass = true; }
+		~BypassEnable() { _bypass = false; }
+	};
 
 public:
 	static int GetFD()
@@ -43,8 +50,10 @@ public:
 
 	static void Alloc(void *p, size_t size)
 	{
-		if (!p)
+		if (!p || _bypass)
 			return;
+
+		BypassEnable be;
 		int fd = GetFD();
 		Record record(RecordType::Alloc, p, size);
 		write(fd, static_cast<void *>(&record), sizeof(record));
@@ -52,8 +61,10 @@ public:
 
 	static void Free(void *p)
 	{
-		if (!p)
+		if (!p || _bypass)
 			return;
+
+		BypassEnable be;
 		int fd = GetFD();
 		Record record(RecordType::Free, p);
 		write(fd, static_cast<void *>(&record), sizeof(record));
@@ -61,6 +72,7 @@ public:
 };
 
 int Monitor::_fd = -1;
+bool __thread Monitor::_bypass = false;
 
 #endif
 
