@@ -34,7 +34,7 @@ private:
 		_Unwind_Ptr ip = _Unwind_GetIP(ctx);
 		_Unwind_Ptr cfa = _Unwind_GetCFA(ctx);
 		_Unwind_Ptr lastIP = state->LastIP;
-		_Unwind_Ptr lastCFA = state->LastIP;
+		_Unwind_Ptr lastCFA = state->LastCFA;
 		state->LastIP = ip;
 		state->LastCFA = cfa;
 		*state->Data++ = ip;
