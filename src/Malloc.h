@@ -5,6 +5,10 @@
 #include <malloc.h>
 
 #if defined(__GNU_LIBRARY__) && !defined(__UCLIBC__)
+#	define LIBC_FUNCTIONS
+#endif
+
+#ifdef LIBC_FUNCTIONS
 extern "C"
 {
 	void *__libc_malloc(size_t size);
@@ -26,7 +30,7 @@ namespace Malloc
 		if (_malloc)
 			return;
 
-#ifdef __GNU_LIBRARY__
+#ifdef LIBC_FUNCTIONS
 		_malloc = &__libc_malloc;
 		_free = &__libc_free;
 		_realloc = &__libc_realloc;
