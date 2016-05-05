@@ -85,3 +85,24 @@ void operator delete[] (void *p, const std::nothrow_t& ) throw()
 {
 	return free(p);
 }
+
+
+__attribute__ ((visibility ("default")))
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+{ return -1; }
+
+__attribute__ ((visibility ("default")))
+void *aligned_alloc(size_t alignment, size_t size)
+{ return NULL; }
+
+__attribute__ ((visibility ("default")))
+void *valloc(size_t size)
+{ return NULL; }
+
+__attribute__ ((visibility ("default")))
+void *memalign(size_t alignment, size_t size)
+{ return NULL; }
+
+__attribute__ ((visibility ("default")))
+void *pvalloc(size_t size)
+{ return NULL; }
