@@ -3,6 +3,10 @@
 
 #include <dlfcn.h>
 #include <malloc.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
 
 #if defined(__GNU_LIBRARY__) && !defined(__UCLIBC__)
 #	define LIBC_FUNCTIONS

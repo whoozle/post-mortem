@@ -2,6 +2,7 @@
 #define RECORD_H_
 
 #include "Backtrace.h"
+#include "Monitor.h"
 #include <stdint.h>
 #include <pthread.h>
 
@@ -23,7 +24,7 @@ struct Record
 	Record()
 	{ }
 	Record(RecordType type, void *ptr, size_t size = 0): Type(type), Thread(pthread_self()), Ptr(reinterpret_cast<uintptr_t>(ptr)), Size(size), BacktraceData()
-	{ Backtrace::Get(BacktraceData, MaxDepth); }
+	{ Monitor::BypassEnable be; Backtrace::Get(BacktraceData, MaxDepth); }
 };
 
 #endif
