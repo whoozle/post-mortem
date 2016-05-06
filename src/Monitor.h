@@ -4,14 +4,14 @@
 class Monitor
 {
 	static int _fd;
-	static __thread bool _bypass;
+	static thread_local int _bypass;
 
 public:
 
 	struct BypassEnable
 	{
-		BypassEnable()  { _bypass = true; }
-		~BypassEnable() { _bypass = false; }
+		BypassEnable()  { ++_bypass; }
+		~BypassEnable() { --_bypass; }
 	};
 
 	static int GetFD();

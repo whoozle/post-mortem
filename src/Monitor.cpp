@@ -8,7 +8,7 @@
 #include <stdio.h>
 
 int Monitor::_fd = -1;
-bool __thread Monitor::_bypass = false;
+int __thread Monitor::_bypass = 0;
 
 int Monitor::GetFD()
 {
