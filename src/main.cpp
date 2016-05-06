@@ -30,9 +30,14 @@ __attribute__ ((visibility ("default")))
 void *realloc(void *ptr, size_t size)
 {
 	void *p = Malloc::Realloc(ptr, size);
-	if (p) {
+	if (p)
+	{
 		Monitor::Free(ptr);
 		Monitor::Alloc(p, size);
+	}
+	else if (size == 0)
+	{
+		Monitor::Free(ptr);
 	}
 	return p;
 }
