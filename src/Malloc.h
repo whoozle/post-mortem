@@ -22,12 +22,20 @@ extern "C"
 }
 #endif
 
+#define GET_SYMBOL(name) _##name = reinterpret_cast<decltype(_##name)>(dlsym(RTLD_NEXT, #name))
+
 namespace Malloc
 {
 	void * (*_malloc)(size_t size) = 0;
 	void (*_free)(void *ptr) = 0;
 	void * (*_calloc)(size_t nmemb, size_t size) = 0;
 	void * (*_realloc)(void *ptr, size_t size) = 0;
+
+	int (*_posix_memalign)(void **memptr, size_t alignment, size_t size);
+	void *(*_aligned_alloc)(size_t alignment, size_t size);
+	void *(*_valloc)(size_t size);
+	void *(*_memalign)(size_t alignment, size_t size);
+	void *(*_pvalloc)(size_t size);
 
 	void Init()
 	{
@@ -40,10 +48,10 @@ namespace Malloc
 		_realloc = &__libc_realloc;
 		_calloc = &__libc_calloc;
 #else
-		_malloc	= reinterpret_cast<decltype(_malloc)>(dlsym(RTLD_NEXT, "malloc"));
-		_free	= reinterpret_cast<decltype(_free)>(dlsym(RTLD_NEXT, "free"));
-		_realloc= reinterpret_cast<decltype(_realloc)>(dlsym(RTLD_NEXT, "realloc"));
-		_calloc	= reinterpret_cast<decltype(_calloc)>(dlsym(RTLD_NEXT, "calloc"));
+		GET_SYMBOL(malloc);
+		GET_SYMBOL(free);
+		GET_SYMBOL(realloc);
+		GET_SYMBOL(calloc);
 #endif
 		if (!_malloc || !_free || !_calloc || !_realloc)
 		{
@@ -51,6 +59,12 @@ namespace Malloc
 			write(STDOUT_FILENO, error, strlen(error));
 			abort();
 		}
+
+		GET_SYMBOL(posix_memalign);
+		GET_SYMBOL(aligned_alloc);
+		GET_SYMBOL(valloc);
+		GET_SYMBOL(memalign);
+		GET_SYMBOL(pvalloc);
 	}
 
 	static void * Alloc(size_t size)
