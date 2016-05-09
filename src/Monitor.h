@@ -20,6 +20,7 @@ public:
 
 	static int GetFD();
 
+	static void Terminate();
 	static void Alloc(void *p, size_t size);
 	static void Free(void *p);
 };

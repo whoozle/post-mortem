@@ -79,7 +79,7 @@ void Monitor::Free(void *p)
 
 	if (_terminationAddress.load() == p)
 	{
-		_globalBypass = true;
+		Terminate();
 		return;
 	}
 
@@ -89,4 +89,32 @@ void Monitor::Free(void *p)
 	int fd = GetFD();
 	Record record(RecordType::Free, p);
 	write(fd, static_cast<void *>(&record), sizeof(record));
+}
+
+void Monitor::Terminate()
+{
+	_globalBypass = true;
+
+	int maps = open("/proc/self/maps", O_RDONLY);
+	if (maps == -1)
+	{
+		perror("cannot open /proc/self/maps");
+		return;
+	}
+
+	int fd = GetFD();
+	{
+		RecordType type = RecordType::Terminate;
+		write(fd, &type, sizeof(type));
+	}
+
+	char buf[4096];
+	size_t r;
+	do
+	{
+		r = read(maps, buf, sizeof(buf));
+		write(fd, buf, r);
+	}
+	while(r == sizeof(buf));
+	close(maps);
 }

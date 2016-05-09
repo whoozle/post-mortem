@@ -8,7 +8,7 @@
 
 enum struct RecordType : unsigned
 {
-	Alloc, Free
+	Alloc, Free, Terminate
 };
 
 struct Record
