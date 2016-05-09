@@ -104,8 +104,8 @@ void Monitor::Terminate()
 
 	int fd = GetFD();
 	{
-		RecordType type = RecordType::Terminate;
-		write(fd, &type, sizeof(type));
+		Record rec(RecordType::Terminate, NULL, 0);
+		write(fd, &rec, sizeof(rec));
 	}
 
 	char buf[4096];
