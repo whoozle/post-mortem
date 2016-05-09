@@ -8,8 +8,9 @@ from subprocess import Popen, PIPE, STDOUT
 
 parser = argparse.ArgumentParser(description='Post-mortem log analyzer')
 parser.add_argument('log', help='log file')
+parser.add_argument('--all', '-a', action='store_true', help='executable')
 parser.add_argument('--exe', help='executable')
-parser.add_argument('-s', help='show reachable')
+parser.add_argument('--show-reachable', '-s', action='store_true', help='show reachable')
 args = parser.parse_args()
 
 with open(args.log) as f:
@@ -77,6 +78,10 @@ class Chunk(object):
 
 	def event(self, state):
 		old = self.state
+		if args.all:
+			print state.action + ':'
+			self.show_state(state)
+
 		if old.action == 'free' and state.action == 'free':
 			self.failure('double free', old, state)
 
@@ -105,8 +110,8 @@ log = data['log']
 for event in log:
 	heap.dispatch(event)
 
-if args.s:
+if args.show_reachable:
 	reachable = heap.dump_alloc()
 	for chunk in reachable:
-		state = chunk.state
-		print "memory block of %d bytes is still reachable" %state.size
+		print "memory block of %d bytes is still reachable" %chunk.state.size
+		chunk.show_state(chunk.state)
