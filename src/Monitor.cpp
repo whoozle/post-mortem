@@ -10,6 +10,16 @@
 int Monitor::_fd = -1;
 int __thread Monitor::_bypass = 0;
 
+std::atomic<void *> Monitor::_terminationAddress(NULL);
+std::atomic<bool> Monitor::_globalBypass(false);
+
+
+#define PRINTF(...) do { \
+	char buf[64]; \
+	size_t r = snprintf(buf, sizeof(buf), __VA_ARGS__); \
+	write(STDOUT_FILENO, buf, r);\
+} while(false)
+
 int Monitor::GetFD()
 {
 	if (_fd < 0)
@@ -38,6 +48,20 @@ int Monitor::GetFD()
 
 void Monitor::Alloc(void *p, size_t size)
 {
+	if (_globalBypass.load())
+		return;
+
+	if (_bypass)
+	{
+		//PRINTF("bypassed malloc %p, %u\n", p, size);
+		//this hack allow library to unload. backtrace deallocates some of its internal structures and freezes while getting backtrace of this 'free'
+#ifdef __mips
+		//fixme: make it really atomic and configurable
+		if (size == 20 && !_terminationAddress.load())
+			_terminationAddress.store(p);
+#endif
+	}
+
 	if (!p || _bypass)
 		return;
 
@@ -48,6 +72,17 @@ void Monitor::Alloc(void *p, size_t size)
 
 void Monitor::Free(void *p)
 {
+	//PRINTF("free %p\n", p);
+
+	if (_globalBypass.load())
+		return;
+
+	if (_terminationAddress.load() == p)
+	{
+		_globalBypass = true;
+		return;
+	}
+
 	if (!p || _bypass)
 		return;
 
