@@ -31,11 +31,11 @@ namespace Malloc
 	void * (*_calloc)(size_t nmemb, size_t size) = 0;
 	void * (*_realloc)(void *ptr, size_t size) = 0;
 
-	int (*_posix_memalign)(void **memptr, size_t alignment, size_t size);
-	void *(*_aligned_alloc)(size_t alignment, size_t size);
-	void *(*_valloc)(size_t size);
-	void *(*_memalign)(size_t alignment, size_t size);
-	void *(*_pvalloc)(size_t size);
+	int (*_posix_memalign)(void **memptr, size_t alignment, size_t size) = 0;
+	void *(*_aligned_alloc)(size_t alignment, size_t size) = 0;
+	void *(*_valloc)(size_t size) = 0;
+	void *(*_memalign)(size_t alignment, size_t size) = 0;
+	void *(*_pvalloc)(size_t size) = 0;
 
 	void Init()
 	{
