@@ -78,9 +78,6 @@ class Chunk(object):
 
 	def event(self, state):
 		old = self.state
-		if args.all:
-			print state.action + ':'
-			self.show_state(state)
 
 		if old.action == 'free' and state.action == 'free':
 			self.failure('double free', old, state)
@@ -101,6 +98,12 @@ class Heap(object):
 			self.__chunks[ptr].event(State(ev))
 		else:
 			self.__chunks[ptr] = Chunk(State(ev))
+
+		if args.all:
+			chunk = self.__chunks[ptr]
+			state = chunk.state
+			print state.action + ':'
+			chunk.show_state(state)
 
 	def dump_alloc(self):
 		return filter(lambda x: x.state.action == 'alloc', self.__chunks.itervalues())
