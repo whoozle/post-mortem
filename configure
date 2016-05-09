@@ -5,19 +5,22 @@ if [ "x$1" = "x" ]; then
 	exit 1
 fi
 PREFIX=$1
+CROSS=${PREFIX:0:-1}
+echo "compiling for $CROSS"
+
+export CC=${PREFIX}gcc
+export CXX=${PREFIX}g++
 
 pushd libunwind
-aclocal
-automake
-autoconf
-./configure CC=${PREFIX}gcc CXX=${PREFIX}g++
+./autogen.sh
+./configure --target=$CROSS --host=$CROSS CC=${PREFIX}gcc CXX=${PREFIX}g++
 make
 popd
 
 rm -rf ${PREFIX}build
 mkdir ${PREFIX}build
 pushd ${PREFIX}build
-cmake -GNinja .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${PREFIX}gcc -DCMAKE_CXX_COMPILER=${PREFIX}g++
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${PREFIX}gcc -DCMAKE_CXX_COMPILER=${PREFIX}g++
 
 popd
 
