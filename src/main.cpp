@@ -55,23 +55,44 @@ extern "C"
 
 	__attribute__ ((visibility ("default")))
 	int posix_memalign(void **memptr, size_t alignment, size_t size)
-	{ return -1; }
+	{
+		int r = Malloc::PosixMemAlign(memptr, alignment, size);
+		if (r == 0)
+			Monitor::Alloc(*memptr, size);
+		return r;
+	}
 
 	__attribute__ ((visibility ("default")))
 	void *aligned_alloc(size_t alignment, size_t size)
-	{ return NULL; }
+	{
+		void *p = Malloc::AlignedAlloc(alignment, size);
+		Monitor::Alloc(p, size);
+		return p;
+	}
 
 	__attribute__ ((visibility ("default")))
 	void *valloc(size_t size)
-	{ return NULL; }
+	{
+		void *p = Malloc::Valloc(size);
+		Monitor::Alloc(p, size);
+		return p;
+	}
 
 	__attribute__ ((visibility ("default")))
 	void *memalign(size_t alignment, size_t size)
-	{ return NULL; }
+	{
+		void *p = Malloc::MemAlign(alignment, size);
+		Monitor::Alloc(p, size);
+		return p;
+	}
 
 	__attribute__ ((visibility ("default")))
 	void *pvalloc(size_t size)
-	{ return NULL; }
+	{
+		void *p = Malloc::PValloc(size);
+		Monitor::Alloc(p, size);
+		return p;
+	}
 
 }
 

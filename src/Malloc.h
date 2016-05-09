@@ -87,6 +87,36 @@ namespace Malloc
 		Init();
 		return _realloc(ptr, size);
 	}
+
+	static int PosixMemAlign(void **ptr, size_t alignment, size_t size)
+	{
+		Init();
+		return _posix_memalign(ptr, alignment, size);
+	}
+
+	static void *AlignedAlloc(size_t alignment, size_t size)
+	{
+		Init();
+		return _aligned_alloc(alignment, size);
+	}
+
+	static void *Valloc(size_t size)
+	{
+		Init();
+		return _valloc(size);
+	}
+
+	static void *MemAlign(size_t alignment, size_t size)
+	{
+		Init();
+		return _memalign(alignment, size);
+	}
+
+	static void *PValloc(size_t size)
+	{
+		Init();
+		return _pvalloc(size);
+	}
 }
 
 #endif
