@@ -20,7 +20,14 @@ symbols = []
 address = []
 loaded = False
 
-sym_re = re.compile(r'^([0-f]+).*\.text\s+([0-f]+)\s+(.+)$', re.IGNORECASE | re.MULTILINE)
+sym_re = re.compile(r'^([0-9a-f]+).*\.text\s+([0-9a-f]+)\s+(.+)$', re.IGNORECASE | re.MULTILINE)
+map_re = re.compile(r'^([0-9a-f]+)-([0-9a-f]+).*?(\S+)$', re.IGNORECASE | re.MULTILINE)
+
+if 'map' in data:
+	for m in map_re.finditer(data['map']):
+		begin, end, lib = int(m.group(1), 16), int(m.group(2), 16), m.group(3)
+		address.append(begin)
+		symbols.append((begin, end - begin, lib))
 
 def load_symbols():
 	global loaded
