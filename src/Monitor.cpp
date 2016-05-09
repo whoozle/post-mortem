@@ -104,7 +104,7 @@ void Monitor::Terminate()
 
 	int fd = GetFD();
 	{
-		Record rec(RecordType::Terminate, NULL, 0);
+		Record rec; rec.Type = RecordType::Terminate;
 		write(fd, &rec, sizeof(rec));
 	}
 

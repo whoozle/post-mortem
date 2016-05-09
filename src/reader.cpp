@@ -21,6 +21,8 @@ int main(int argc, char **argv)
 		Record rec;
 		if (fread(static_cast<void *>(&rec), sizeof(rec), 1, log) != 1)
 			break;
+		if (rec.Type == RecordType::Terminate)
+			break;
 
 		if (!first)
 		{
@@ -57,7 +59,14 @@ int main(int argc, char **argv)
 			printf("{\"action\": \"invalid\" }");
 		}
 	}
-	printf("\n]}\n");
+
+	printf("\n],\n\"map\": \"");
+	size_t r;
+	char buf[4096];
+	do
+	{ r = fread(buf, 1, sizeof(buf), log); fwrite(buf, 1, r, stdout); }
+	while(r == sizeof(buf));
+	printf("\"}\n");
 	fclose(log);
 	return 0;
 }
