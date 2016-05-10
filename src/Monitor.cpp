@@ -11,7 +11,7 @@ int Monitor::_fd = -1;
 int __thread Monitor::_bypass = 0;
 
 std::atomic<void *> Monitor::_terminationAddress(NULL);
-std::atomic<bool> Monitor::_globalBypass(false);
+std::atomic<bool> Monitor::_globalBypass(true);
 
 
 #define PRINTF(...) do { \
@@ -57,7 +57,7 @@ void Monitor::Alloc(void *p, size_t size)
 		//this hack allow library to unload. backtrace deallocates some of its internal structures and freezes while getting backtrace of this 'free'
 #ifdef __mips
 		//fixme: make it really atomic and configurable
-		if (size == 20 && !_terminationAddress.load())
+		if (!_terminationAddress.load())
 			_terminationAddress.store(p);
 #endif
 	}

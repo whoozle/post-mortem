@@ -3,6 +3,17 @@
 #include "Malloc.h"
 #include <new>
 
+__attribute__ ((constructor))
+void Ctor()
+{
+	Monitor::SetGlobalBypass(false);
+}
+
+__attribute__ ((destructor))
+void Dtor()
+{
+	Monitor::SetGlobalBypass(true);
+}
 
 extern "C"
 {

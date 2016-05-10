@@ -18,6 +18,9 @@ public:
 		~BypassEnable() { --_bypass; }
 	};
 
+	static void SetGlobalBypass(bool bypass)
+	{ _globalBypass = bypass; }
+
 	static int GetFD();
 
 	static void Terminate();
