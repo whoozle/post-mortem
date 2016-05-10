@@ -24,8 +24,12 @@ int Monitor::GetFD()
 {
 	if (_fd < 0)
 	{
-		char exenamebuf[BUFSIZ];
-		readlink("/proc/self/exe", exenamebuf, BUFSIZ);
+		char exenamebuf[512];
+		size_t namesize = readlink("/proc/self/exe", exenamebuf, sizeof(exenamebuf));
+		if (namesize == sizeof(exenamebuf))
+			--namesize;
+		exenamebuf[namesize] = 0;
+
 		char *exename = strrchr(exenamebuf, '/');
 		if (exename == NULL)
 			exename = exenamebuf;
